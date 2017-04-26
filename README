@@ -1,11 +1,12 @@
 # beanstalk-client
 
-Java beanstalk client focus on simplicity.
-check the link http://kr.github.io/beanstalkd/ for details.
+A java beanstalk client focus on simplicity.
+
+Check the link http://kr.github.io/beanstalkd/ for details.
 
 # Usage
 
-BeansTalkClient producer = new BeansTalkClient(HOST, PORT);
+BeansTalkClient producer = new BeansTalkClient("localhost", 11300);
 try {
     producer.use("TUBE");
     long jobId = beansTalkClient.put(0, 0, 4, "Test Message".getBytes());
@@ -17,7 +18,7 @@ try {
 
 ...
 
-BeansTalkClient consumer = new BeansTalkClient(HOST, PORT);
+BeansTalkClient consumer = new BeansTalkClient("localhost", 11300);
 try {
     consumer.watch("TUBE");
     while (true) {
