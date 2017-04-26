@@ -1,7 +1,7 @@
 # beanstalk-client
 A Java Beanstalk Client
 
-# Usage
+## Usage
 
 BeansTalkClient producer = new BeansTalkClient(HOST, PORT);
 try {
