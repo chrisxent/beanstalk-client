@@ -1,7 +1,9 @@
 # beanstalk-client
-A Java Beanstalk Client
 
-## Usage
+Java beanstalk client focus on simplicity.
+check the link http://kr.github.io/beanstalkd/ for details.
+
+# Usage
 
 BeansTalkClient producer = new BeansTalkClient(HOST, PORT);
 try {
