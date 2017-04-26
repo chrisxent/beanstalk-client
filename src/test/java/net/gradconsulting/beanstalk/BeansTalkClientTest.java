@@ -32,7 +32,7 @@ public class BeansTalkClientTest {
             Assert.assertTrue(wn > 0);
             BeansTalkJob job = consumer.reserve();
             Assert.assertTrue(job.getId() == jobId);
-            consumer.delete(job.getId());
+            Assert.assertTrue(consumer.delete(job.getId()));
             consumer.close();
         } catch (BeansTalkException e) {
             Assert.fail("Unexpected BeansTalkException: " + e.getMessage());
@@ -54,7 +54,7 @@ public class BeansTalkClientTest {
             Assert.assertTrue(wn > 0);
             BeansTalkJob job = beansTalkClient.reserve();
             Assert.assertTrue(job.getId() == jobId);
-            beansTalkClient.delete(job.getId());
+            Assert.assertTrue(beansTalkClient.delete(job.getId()));
             beansTalkClient.close();
         } catch (BeansTalkException e) {
             Assert.fail("Unexpected BeansTalkException: " + e.getMessage());
@@ -93,7 +93,7 @@ public class BeansTalkClientTest {
         } catch (BeansTalkException e) {
             Assert.assertTrue(e.getMessage().contains("Dead line soon"));
             try {
-                consumer.delete(jobId);
+                Assert.assertTrue(consumer.delete(jobId));
             } catch (BeansTalkException e1) {
                 Assert.fail("Job could not be deleted");
             }
@@ -114,7 +114,7 @@ public class BeansTalkClientTest {
 
             consumer.watch(TEST_TUBE);
             consumer.reserve();
-            consumer.release(jobId, 0, 0);
+            Assert.assertTrue(consumer.release(jobId, 0, 0));
             BeansTalkJob job = consumer.reserve();
             Assert.assertTrue(job.getId() == jobId);
             consumer.delete(job.getId());
@@ -133,9 +133,8 @@ public class BeansTalkClientTest {
             jobId = beansTalkClient.put(0, 0, 4, TEST_MSG.getBytes(Charset.defaultCharset()));
             beansTalkClient.watch(TEST_TUBE);
             beansTalkClient.reserve();
-            beansTalkClient.bury(jobId, 0);
-            long r = beansTalkClient.kick(1);
-            Assert.assertTrue(r == 1);
+            Assert.assertTrue(beansTalkClient.bury(jobId, 0));
+            Assert.assertTrue(beansTalkClient.kick(1) == 1);
             beansTalkClient.delete(jobId);
             beansTalkClient.close();
         } catch (BeansTalkException e) {
@@ -152,8 +151,8 @@ public class BeansTalkClientTest {
             jobId = beansTalkClient.put(0, 0, 4, TEST_MSG.getBytes(Charset.defaultCharset()));
             beansTalkClient.watch(TEST_TUBE);
             beansTalkClient.reserve();
-            beansTalkClient.bury(jobId, 0);
-            beansTalkClient.kickJob(jobId);
+            Assert.assertTrue(beansTalkClient.bury(jobId, 0));
+            Assert.assertTrue(beansTalkClient.kickJob(jobId));
             beansTalkClient.delete(jobId);
             beansTalkClient.close();
         } catch (BeansTalkException e) {

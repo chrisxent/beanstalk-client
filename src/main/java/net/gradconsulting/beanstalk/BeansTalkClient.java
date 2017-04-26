@@ -67,55 +67,63 @@ public class BeansTalkClient {
         return new BeansTalkJob(id, Arrays.copyOf(payload.toByteArray(), payload.toByteArray().length));
     }
 
-    public void delete(long jobId) throws BeansTalkException {
+    public boolean delete(long jobId) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "delete " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Job id not found");
+            return false;
 
         if (!controlLine.startsWith("DELETED"))
             throw new BeansTalkException("Invalid response in delete: " + controlLine);
+
+        return true;
     }
 
-    public void release(long id, int priority, int delay) throws BeansTalkException {
+    public boolean release(long id, int priority, int delay) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "release " + id + " " + priority + " " + delay + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("BURIED"))
-            throw new BeansTalkException("job buried. the server ran out of memory");
+            return false;//throw new BeansTalkException("job buried. the server ran out of memory");
 
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Job id not found");
+            return false;//throw new BeansTalkException("Job id not found");
 
         if (!controlLine.startsWith("RELEASED"))
             throw new BeansTalkException("Invalid response in release: " + controlLine);
+
+        return true;
     }
 
-    public void bury(long jobId, int priority) throws BeansTalkException {
+    public boolean bury(long jobId, int priority) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "bury " + jobId + " " + priority + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Job id not found");
+            return false;//throw new BeansTalkException("Job id not found");
 
         if (!controlLine.startsWith("BURIED"))
             throw new BeansTalkException("Invalid response in bury: " + controlLine);
+
+        return true;
     }
 
-    public void touch(long jobId) throws BeansTalkException {
+    public boolean touch(long jobId) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "touch " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Job id not found");
+            return false;//throw new BeansTalkException("Job id not found");
 
         if (!controlLine.startsWith("TOUCHED"))
             throw new BeansTalkException("Invalid response in touch: " + controlLine);
+
+        return true;
     }
 
     public int watch(String tube) throws BeansTalkException {
@@ -188,16 +196,18 @@ public class BeansTalkClient {
         return toLong(controlLine.replaceAll("[^0-9]", ""));
     }
 
-    public void kickJob(long jobId) throws BeansTalkException {
+    public boolean kickJob(long jobId) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "kick " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Job not found");
+            return false;
 
         if (!controlLine.startsWith("KICKED"))
             throw new BeansTalkException("Invalid response in kick: " + controlLine);
+
+        return true;
     }
 
     public String statsJob(long jobId) throws BeansTalkException {
@@ -256,16 +266,18 @@ public class BeansTalkClient {
         this.close();
     }
 
-    public void pauseTube(String tube, int delay) throws BeansTalkException {
+    public boolean pauseTube(String tube, int delay) throws BeansTalkException {
         this.init();
         String controlLine = "";
         String command = "pause-tube " + tube + " " + delay + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            throw new BeansTalkException("Tube not found");
+            return false;//throw new BeansTalkException("Tube not found");
 
         if (!controlLine.startsWith("PAUSED"))
             throw new BeansTalkException("Invalid response in pause-tube: " + controlLine);
+
+        return true;
     }
 
     /**** End of commands ****/
