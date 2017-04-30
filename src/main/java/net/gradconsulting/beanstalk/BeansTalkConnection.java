@@ -41,7 +41,6 @@ class BeansTalkConnection {
             for (int i = 0; i < buf.limit() - 1; i++) {
                 if (buf.get(i) == '\r' && buf.get(i + 1) == '\n') {
                     String controlLine = new String(Arrays.copyOf(buf.array(), i), Charset.defaultCharset());
-                    buf.clear();
                     return controlLine;
                 }
             }
