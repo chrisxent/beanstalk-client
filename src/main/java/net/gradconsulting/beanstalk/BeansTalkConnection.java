@@ -33,9 +33,6 @@ class BeansTalkConnection {
     }
 
     public String readControlLine() throws IOException, BeansTalkException {
-        if (!this.isOpen())
-            throw new IllegalStateException("Connection is close");
-
         /* 1k must be enough for a single response */
         ByteBuffer buf = ByteBuffer.allocate(BUFFER_SIZE);
         int read = this.socketChannel.read(buf);
