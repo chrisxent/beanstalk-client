@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 class BeansTalkConnection {
 
-    private static final int BUFFER_SIZE = 1024;
+    private static final int INIT_BUFF_SIZE = 1024; //1k must be enough for a single response or to reach the first [\r\n]
     private final String host;
     private final int port;
     private SocketChannel socketChannel;
@@ -33,16 +33,13 @@ class BeansTalkConnection {
     }
 
     public String readControlLine() throws IOException, BeansTalkException {
-        /* 1k must be enough for a single response */
-        ByteBuffer buf = ByteBuffer.allocate(BUFFER_SIZE);
+        ByteBuffer buf = ByteBuffer.allocate(INIT_BUFF_SIZE);
         int read = this.socketChannel.read(buf);
         if (read > 0) {
             buf.flip();
             for (int i = 0; i < buf.limit() - 1; i++) {
-                if (buf.get(i) == '\r' && buf.get(i + 1) == '\n') {
-                    String controlLine = new String(Arrays.copyOf(buf.array(), i), Charset.defaultCharset());
-                    return controlLine;
-                }
+                if (buf.get(i) == '\r' && buf.get(i + 1) == '\n')
+                    return new String(Arrays.copyOf(buf.array(), i), Charset.defaultCharset());
             }
         } else {
             throw new BeansTalkException("No data found");
@@ -53,8 +50,7 @@ class BeansTalkConnection {
     public String readControlLine(CommandHandler commandHandler, ByteArrayOutputStream payload) throws IOException,
             BeansTalkException {
 
-        /* 1k must be enough to reach the first line terminator '\r\n' */
-        ByteBuffer buf = ByteBuffer.allocate(BUFFER_SIZE);
+        ByteBuffer buf = ByteBuffer.allocate(INIT_BUFF_SIZE);
         String controlLine = null;
         int dataLen, read, dataRem = 0;
 
