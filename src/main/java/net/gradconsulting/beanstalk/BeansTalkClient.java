@@ -12,13 +12,15 @@ public class BeansTalkClient {
         this.beansTalkConnection = new BeansTalkConnection(host, port);
     }
 
-    /* http://kr.github.io/beanstalkd */
-    /* https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt */
+    /*
+     * http://kr.github.io/beanstalkd
+     * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
+     */
 
     /***** Producer Commands *****/
 
     public long put(long priority, int delay, int ttr, byte[] data) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "put " + priority + " " + delay + " " + ttr + " " + data.length + "\r\n";
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
@@ -37,7 +39,7 @@ public class BeansTalkClient {
     }
 
     public void use(String tube) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "use " + tube + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -48,7 +50,7 @@ public class BeansTalkClient {
     /***** Worker Commands *****/
 
     public BeansTalkJob reserve() throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "reserve\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
@@ -58,7 +60,7 @@ public class BeansTalkClient {
     }
 
     public BeansTalkJob reserve(int timeoutSeconds) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "reserve-with-timeout " + timeoutSeconds + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
@@ -68,7 +70,7 @@ public class BeansTalkClient {
     }
 
     public boolean delete(long jobId) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "delete " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -82,15 +84,12 @@ public class BeansTalkClient {
     }
 
     public boolean release(long id, int priority, int delay) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "release " + id + " " + priority + " " + delay + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
-        if (controlLine.startsWith("BURIED"))
-            return false;//throw new BeansTalkException("job buried. the server ran out of memory");
-
-        if (controlLine.startsWith("NOT_FOUND"))
-            return false;//throw new BeansTalkException("Job id not found");
+        if (controlLine.startsWith("BURIED") || controlLine.startsWith("NOT_FOUND"))
+            return false;
 
         if (!controlLine.startsWith("RELEASED"))
             throw new BeansTalkException("Invalid response in release: " + controlLine);
@@ -99,12 +98,12 @@ public class BeansTalkClient {
     }
 
     public boolean bury(long jobId, int priority) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "bury " + jobId + " " + priority + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            return false;//throw new BeansTalkException("Job id not found");
+            return false;
 
         if (!controlLine.startsWith("BURIED"))
             throw new BeansTalkException("Invalid response in bury: " + controlLine);
@@ -113,12 +112,12 @@ public class BeansTalkClient {
     }
 
     public boolean touch(long jobId) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "touch " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            return false;//throw new BeansTalkException("Job id not found");
+            return false;
 
         if (!controlLine.startsWith("TOUCHED"))
             throw new BeansTalkException("Invalid response in touch: " + controlLine);
@@ -127,7 +126,7 @@ public class BeansTalkClient {
     }
 
     public int watch(String tube) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "watch " + tube + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -138,7 +137,7 @@ public class BeansTalkClient {
     }
 
     public int ignore(String tube) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "ignore " + tube + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -154,7 +153,7 @@ public class BeansTalkClient {
     /***** Other Commands *****/
 
     public String peek(long jobId) throws BeansTalkException {
-        this.init();
+        init();
         String command = "peek " + jobId + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.peekCommandHandler, payload);
@@ -162,7 +161,7 @@ public class BeansTalkClient {
     }
 
     public String peekReady() throws BeansTalkException {
-        this.init();
+        init();
         String command = "peek-ready" + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.peekCommandHandler, payload);
@@ -170,7 +169,7 @@ public class BeansTalkClient {
     }
 
     public String peekDelayed() throws BeansTalkException {
-        this.init();
+        init();
         String command = "peek-delayed" + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.peekCommandHandler, payload);
@@ -178,7 +177,7 @@ public class BeansTalkClient {
     }
 
     public String peekBuried() throws BeansTalkException {
-        this.init();
+        init();
         String command = "peek-buried" + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.peekCommandHandler, payload);
@@ -186,7 +185,7 @@ public class BeansTalkClient {
     }
 
     public long kick(int bound) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "kick " + bound + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -197,7 +196,7 @@ public class BeansTalkClient {
     }
 
     public boolean kickJob(long jobId) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "kick " + jobId + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -211,7 +210,7 @@ public class BeansTalkClient {
     }
 
     public String statsJob(long jobId) throws BeansTalkException {
-        this.init();
+        init();
         String command = "stats-job " + jobId + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.statsJobCommandHandler, payload);
@@ -219,7 +218,7 @@ public class BeansTalkClient {
     }
 
     public String statsTube(String tube) throws BeansTalkException {
-        this.init();
+        init();
         String command = "stats-tube " + tube + "\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.statsTubeCommandHandler, payload);
@@ -227,7 +226,7 @@ public class BeansTalkClient {
     }
 
     public String stats() throws BeansTalkException {
-        this.init();
+        init();
         String statsTubeCommand = "stats\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(statsTubeCommand.getBytes(Charset.defaultCharset()), CommandHelper.statsCommandHandler, payload);
@@ -235,7 +234,7 @@ public class BeansTalkClient {
     }
 
     public String listTubes() throws BeansTalkException {
-        this.init();
+        init();
         String command = "list-tubes\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.listTubesCommandHandler, payload);
@@ -243,7 +242,7 @@ public class BeansTalkClient {
     }
 
     public String listTubeUsed() throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "list-tube-used" + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
@@ -255,7 +254,7 @@ public class BeansTalkClient {
     }
 
     public String listTubesWatched() throws BeansTalkException {
-        this.init();
+        init();
         String command = "list-tubes-watched\r\n";
         ByteArrayOutputStream payload = new ByteArrayOutputStream();
         send(command.getBytes(Charset.defaultCharset()), CommandHelper.listTubesWatchedCommandHandler, payload);
@@ -267,12 +266,12 @@ public class BeansTalkClient {
     }
 
     public boolean pauseTube(String tube, int delay) throws BeansTalkException {
-        this.init();
+        init();
         String controlLine = "";
         String command = "pause-tube " + tube + " " + delay + "\r\n";
         controlLine = send(command.getBytes(Charset.defaultCharset()));
         if (controlLine.startsWith("NOT_FOUND"))
-            return false;//throw new BeansTalkException("Tube not found");
+            return false;
 
         if (!controlLine.startsWith("PAUSED"))
             throw new BeansTalkException("Invalid response in pause-tube: " + controlLine);
@@ -291,6 +290,8 @@ public class BeansTalkClient {
     }
 
     public void close() throws BeansTalkException {
+        if (!this.beansTalkConnection.isOpen())
+            return;
         try {
             this.beansTalkConnection.close();
         } catch (IOException e) {

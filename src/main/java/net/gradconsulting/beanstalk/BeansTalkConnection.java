@@ -20,16 +20,12 @@ class BeansTalkConnection {
     }
 
     public void connect() throws IOException {
-        if (this.isOpen())
-            return;
-
         this.socketChannel = SocketChannel.open();
         this.socketChannel.connect(new InetSocketAddress(this.host, this.port));
     }
 
     public void close() throws IOException {
-        if (this.isOpen())
-            this.socketChannel.close();
+        this.socketChannel.close();
     }
 
     public boolean isOpen() {
@@ -58,9 +54,8 @@ class BeansTalkConnection {
         throw new BeansTalkException("Control line terminator not found");
     }
 
-    public String readControlLine(CommandHandler commandHandler, ByteArrayOutputStream payload) throws IOException, BeansTalkException {
-        if (!this.isOpen())
-            throw new IllegalStateException("Connection is close");
+    public String readControlLine(CommandHandler commandHandler, ByteArrayOutputStream payload) throws IOException,
+            BeansTalkException {
 
         /* 1k must be enough to reach the first line terminator '\r\n' */
         ByteBuffer buf = ByteBuffer.allocate(BUFFER_SIZE);
@@ -75,7 +70,7 @@ class BeansTalkConnection {
         for (int i = 0; i < buf.limit() - 1; i++) {
             if (buf.get(i) == '\r' && buf.get(i + 1) == '\n') {
                 controlLine = new String(Arrays.copyOf(buf.array(), i), Charset.defaultCharset());
-                dataLen = commandHandler.parse(controlLine);
+                dataLen = commandHandler.process(controlLine);
                 if (dataLen < 1)
                     return controlLine;
 
@@ -121,9 +116,6 @@ class BeansTalkConnection {
     }
 
     public void write(byte[] bytes) throws IOException {
-        if (!this.isOpen())
-            throw new IllegalStateException("Connection is close");
-
         ByteBuffer buf = ByteBuffer.wrap(bytes);
         while (buf.hasRemaining())
             socketChannel.write(buf);
