@@ -1,6 +1,6 @@
 # beanstalk-client
 
-A java beanstalk client focus on simplicity.
+A java beanstalk client Focus on simplicity and single thread performance.
 
 Check the link http://kr.github.io/beanstalkd/ for details.
 
