@@ -9,7 +9,7 @@ Check the link http://kr.github.io/beanstalkd/ for details.
 BeansTalkClient producer = new BeansTalkClient("localhost", 11300);
 try {
     producer.use("TUBE");
-    long jobId = beansTalkClient.put(0, 0, 4, "Test Message".getBytes());
+    long jobId = producer.put(0, 0, 4, "Test Message".getBytes());
     ...
     producer.close();
     
