@@ -3,8 +3,12 @@ package net.gradconsulting.beanstalk;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import org.apache.log4j.Logger;
+
 
 public class BeansTalkClient {
+
+    private static final Logger log = Logger.getLogger(BeansTalkClient.class);
 
     private final BeansTalkConnection beansTalkConnection;
 
@@ -305,6 +309,7 @@ public class BeansTalkClient {
         try {
             this.beansTalkConnection.connect();
         } catch (IOException ex) {
+            log.error("IO Error: ", ex);
             throw new BeansTalkException(ex.getMessage());
         }
     }
